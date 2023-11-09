@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>机密应用云平台服务实例部署文档 - Aliyun 计算巢 x 机密应用云平台</title>
+
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="search/main.js"></script>
+  
+
+  
+
+  <script src="js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#_1">机密应用云平台服务实例部署文档</a></li>
+              
+                  <li><a href="#_2">概述</a></li>
+                  
+              
+                  <li><a href="#_3">计费说明</a></li>
+                  
+              
+                  <li><a href="#_4">部署流程</a></li>
+                  
+                      <li class="li-h3"><a href="#_5">前置条件</a></li>
+                  
+                      <li class="li-h3"><a href="#_6">部署步骤</a></li>
+                  
+                      <li class="li-h3"><a href="#_7">部署参数说明</a></li>
+                  
+                      <li class="li-h3"><a href="#_8">验证结果</a></li>
+                  
+              
+                  <li><a href="#_9">使用机密应用云平台</a></li>
+                  
+                      <li class="li-h3"><a href="#_10">创建应用</a></li>
+                  
+              
+                  <li><a href="#_11">问题排查</a></li>
+                  
+                      <li class="li-h3"><a href="#_12">问题一：部署区域无可用资源</a></li>
+                  
+                      <li class="li-h3"><a href="#web">问题二: 启动后web访问不通</a></li>
+                  
+                      <li class="li-h3"><a href="#_13">问题三: 登录时的用户名密码不正确</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="_1">机密应用云平台服务实例部署文档</h1>
+<h2 id="_2">概述</h2>
+<p>基于云原生机密计算底座，提供机密应用的全生命周期管理和开箱即用的基础服务接口，帮助用户快速实现和部署云上机密应用服务。</p>
+<p>目前机密应用云平台处于<strong>免费</strong>试用阶段，欢迎大家申请试用，期间发现任何问题也欢迎反馈交流。</p>
+<h2 id="_3">计费说明</h2>
+<p>机密计算云平台在计算巢上的费用主要涉及：</p>
+<ul>
+<li>ACK Worker 节点规格</li>
+<li>ACK Worker 节点系统盘类型及容量</li>
+<li>数据库类型及规格</li>
+</ul>
+<p>计费方式包括：</p>
+<ul>
+<li>按量付费（小时）</li>
+<li>包年包月</li>
+</ul>
+<p>目前提供如下实例：</p>
+<table>
+<thead>
+<tr>
+<th>Worker 节点规格</th>
+<th>Worker 节点系统盘大小</th>
+<th>Worker 节点系统盘磁盘类型</th>
+<th>MySQL 实例系列</th>
+<th>MySQL 实例规格</th>
+<th>MySQL 实例磁盘大小</th>
+<th>MySQL 实例存储类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ecs.g7t.4xlarge 安全增强通用型 g7t, 4vCPU 32GiB</td>
+<td>60BiB</td>
+<td>ESSD云盘</td>
+<td>基础版</td>
+<td>mysql.n2.medium.1, 2vCPU 4GiB</td>
+<td>30GiB</td>
+<td>ESSD云盘</td>
+</tr>
+<tr>
+<td>ecs.g7t.6xlarge 安全增强通用型 g7t, 24vCPU 96GiB</td>
+<td>120BiB</td>
+<td>ESSD云盘</td>
+<td>高可用版</td>
+<td>rds.mysql.s2.large, 2vCPU 4GiB</td>
+<td>30GiB</td>
+<td>ESSD云盘</td>
+</tr>
+</tbody>
+</table>
+<p>预估费用在创建实例时可实时看到。
+如需更多规格、其他服务（如集群高可用性要求等），可使用自定义规格。</p>
+<h2 id="_4">部署流程</h2>
+<h3 id="_5">前置条件</h3>
+<ul>
+<li>RAM账号所需权限: 机密应用云平台服务需要对ACK、ECS、VPC等资源进行访问和创建操作，若您使用RAM用户创建服务实例，需要在创建服务实例前，对使用的RAM用户的账号添加相应资源的权限。添加RAM权限的详细操作，请参见<a href="https://help.aliyun.com/document_detail/121945.html">为RAM用户授权</a>。所需权限如下表所示。</li>
+</ul>
+<p>| --- | --- |
+| 权限策略名称                      | 备注                                    |
+|---------------------------------|---------------------------------------|
+| AliyunCSFullAccess              | 管理容器服务(CS)的权限             |
+| AliyunECSFullAccess             | 管理云服务器服务（ECS）的权限             |
+| AliyunVPCFullAccess             | 管理专有网络（VPC）的权限                 |
+| AliyunRDSFullAccess             | 管理云数据库服务(RDS)的权限               |
+| AliyunROSFullAccess             | 管理资源编排服务（ROS）的权限             |
+| AliyunComputeNestUserFullAccess | 管理计算巢服务（ComputeNest）的用户侧权限  |
+| AliyunCloudMonitorFullAccess    | 管理云监控（CloudMonitor）的权限          |</p>
+<h3 id="_6">部署步骤</h3>
+<ol>
+<li>
+<p>进入服务实例部署页面，您可以在阿里云计算巢自行搜索，也可以通过该 <a href="https://computenest.console.aliyun.com/user/cn-hangzhou/serviceInstanceCreate?ServiceId=service-ddb57df594fa46428172&amp;isTrial=true">部署链接</a> 快速到达。</p>
+</li>
+<li>
+<p>填写申请试用的表单，在审核通过后，就可以创建机密应用云平台服务。</p>
+</li>
+<li>
+<p>根据服务实例创建的界面提示，填写参数并提交部署。</p>
+</li>
+</ol>
+<h3 id="_7">部署参数说明</h3>
+<p>您在创建服务实例的过程中，需要配置服务实例的参数，各参数说明如下：</p>
+<table>
+<thead>
+<tr>
+<th>参数项</th>
+<th>示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务实例名称</td>
+<td>test</td>
+<td>实例的名称</td>
+</tr>
+<tr>
+<td>地域</td>
+<td>华北1（杭州）</td>
+<td>选中服务实例的地域，建议就近选中，以获取更好的网络延时。</td>
+</tr>
+<tr>
+<td>可用区</td>
+<td>可用区K</td>
+<td>地域下的不同可用区域，确保实例非空。</td>
+</tr>
+<tr>
+<td>选择套餐</td>
+<td>试用版、标准版、自定义套餐</td>
+<td>根据实际需求选择套餐</td>
+</tr>
+<tr>
+<td>登录密码</td>
+<td><strong>*</strong>*</td>
+<td>设置机密应用云平台登录密码，用户名默认为 <code>antCloudAdmin</code>。长度8~30个字符，必须包含三项（大写字母、小写字母、数字、 ()`~!@#$%^&amp;*_-+={}[]:;'&lt;&gt;,.?/ 中的特殊符号）。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_8">验证结果</h3>
+<ol>
+<li>进入 <strong>服务实例详情页</strong> ，可以在 <strong>部署日志</strong> 中查看服务实例部署过程，部署时间大约需要 15 分钟。部署完成后，可以在 <strong>概览</strong> 中看到部署状态为 <strong>已部署</strong>。 </li>
+<li>部署完成后，进入 <strong>服务实例详情页</strong>，可以在 <strong>概览-实例信息-Endpoint</strong> 获取到服务的访问地址，点击该地址即可访问机密应用云平台。</li>
+</ol>
+<h2 id="_9">使用机密应用云平台</h2>
+<h3 id="_10">创建应用</h3>
+<ol>
+<li>
+<p>点击 <strong>服务实例详情页-概览-实例信息-Endpoint</strong> 进入机密应用云平台。
+<img alt="access-endpoint.jpg" src="access-endpoint.jpg" /></p>
+</li>
+<li>
+<p>在登录页面输入用户名密码，用户名默认为 antCloudAdmin，密码为创建服务实例时配置的登录密码。
+<img alt="login.png" src="login.png" /></p>
+</li>
+<li>
+<p>登录成功后，进入 cluster-local 集群管理页面，在 <strong>工作负载-部署(Deployments)</strong> 页面中，点击 <strong>创建 Deployment</strong> 按钮。
+<img alt="list-deployment.png" src="list-deployment.png" /></p>
+</li>
+<li>
+<p>根据页面提示，填写表单并提交：</p>
+<ul>
+<li>镜像地址：需要填写可被公网拉取的镜像地址，如果是私有镜像，可以配置保密字典来拉取镜像。</li>
+<li>加密内存: 机密应用所需的加密内存资源数，集群中可使用的加密内存资源数可以在 <strong>集群管理-节点</strong> 中查看。
+<img alt="create-deployment.png" src="create-deployment.png" /></li>
+</ul>
+</li>
+<li>
+<p>查看应用状态，待 Pod 实际数 与 期望数 一致时，则部署完成。</p>
+</li>
+</ol>
+<h2 id="_11">问题排查</h2>
+<h3 id="_12">问题一：部署区域无可用资源</h3>
+<p>有时，所选部署区域（如可用区G）没有所选套餐的可用资源，会报错如下图所示</p>
+<p><img alt="trouble-1.jpeg" src="trouble1.jpeg" /></p>
+<p><strong>解决办法</strong>：尝试选择其他区域，如可用区I等</p>
+<h3 id="web">问题二: 启动后web访问不通</h3>
+<p>web的启动需要一点点时间，请稍后刷新页面即可。</p>
+<h3 id="_13">问题三: 登录时的用户名密码不正确</h3>
+<p>请注意检查，登录时使用的密码应为创建服务实例时填写的 <strong>登录密码</strong>，用户名默认为 antCloudAdmin</p>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.5.3
+  Docs Build Date UTC : 2023-11-09 11:51:30.562784+00:00
+  -->
+</body>
+</html>
